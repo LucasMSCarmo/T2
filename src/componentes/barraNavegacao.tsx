@@ -1,64 +1,113 @@
-// barraNavegacao.tsx (atualizado)
 import { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min";
 
-type Props = {
-    seletorView: (valor: string, evento?: React.MouseEvent) => void;
+type props = {
+    tema: string;
+    seletorView: (novaTela: string, evento: React.MouseEvent) => void;
+    onAbrirCadastroPet: () => void;
 }
 
-export default class BarraNavegacao extends Component<Props> {
+
+export default class BarraNavegacao extends Component<props> {
     render() {
+        const { tema, seletorView, onAbrirCadastroPet } = this.props;
+
         return (
-            <nav className="navbar navbar-expand-lg navbar-dark bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+            <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: tema }}>
                 <div className="container-fluid">
-                    <span className="navbar-brand d-flex align-items-center font-bold text-xl">
-                        <i className="bi bi-heart-pulse-fill me-2"></i>
+                    <a className="navbar-brand" href="#">
+                        <i className="bi bi-heart-fill me-2"></i>
                         PetLovers
-                    </span>
+                    </a>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNav">
-                        <ul className="navbar-nav me-auto">
-                            <li className="nav-item mx-1">
-                                <a className="nav-link hover:bg-blue-700 px-3 py-2 rounded-md transition-all duration-200 flex items-center" 
-                                   href="#" onClick={(e) => this.props.seletorView('Clientes', e)}>
-                                    <i className="bi bi-people-fill me-2"></i>Clientes
+                        <ul className="navbar-nav">
+                            <li className="nav-item">
+                                <a className="nav-link" href="#" onClick={(e) => seletorView('Clientes', e)}>
+                                    <i className="bi bi-people-fill me-1"></i>
+                                    Clientes & Pets
                                 </a>
                             </li>
-                            <li className="nav-item mx-1">
-                                <a className="nav-link hover:bg-blue-700 px-3 py-2 rounded-md transition-all duration-200 flex items-center" 
-                                   href="#" onClick={(e) => this.props.seletorView('Produtos', e)}>
-                                    <i className="bi bi-box-seam-fill me-2"></i>Produtos
+
+                            <li className="nav-item">
+                                <a className="nav-link" href="#" onClick={(e) => seletorView('Catálogo', e)}>
+                                    <i className="bi bi-journal-album me-1"></i>
+                                    Catálogo
                                 </a>
                             </li>
-                            <li className="nav-item mx-1">
-                                <a className="nav-link hover:bg-blue-700 px-3 py-2 rounded-md transition-all duration-200 flex items-center" 
-                                   href="#" onClick={(e) => this.props.seletorView('Servicos', e)}>
-                                    <i className="bi bi-scissors me-2"></i>Serviços
+
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownRelatorios" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i className="bi bi-file-earmark-bar-graph-fill me-1"></i>
+                                    Relatórios
                                 </a>
+                                <ul className="dropdown-menu" aria-labelledby="navbarDropdownRelatorios">
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={(e) => seletorView('RelatoriosConsumo', e)}>
+                                            <i className="bi bi-graph-up-arrow me-2"></i>
+                                            Top 10 Consumidores
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={(e) => seletorView('RelatorioMaisConsumidos', e)}>
+                                            <i className="bi bi-star-fill me-2"></i>
+                                            Itens Mais Consumidos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={(e) => seletorView('RelatorioConsumoPets', e)}>
+                                            <i className="bi bi-pie-chart-fill me-2"></i>
+                                            Consumo por Tipo e Raça
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={(e) => seletorView('RelatorioTopValor', e)}>
+                                            <i className="bi bi-trophy-fill me-2"></i>
+                                            Top 5 Clientes (Valor)
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
-                            <li className="nav-item mx-1">
-                                <a className="nav-link hover:bg-blue-700 px-3 py-2 rounded-md transition-all duration-200 flex items-center" 
-                                   href="#" onClick={(e) => this.props.seletorView('RegistroConsumo', e)}>
-                                    <i className="bi bi-cart-plus-fill me-2"></i>Registrar Consumo
+
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i className="bi bi-file-earmark-plus me-1"></i>
+                                    Cadastros
                                 </a>
-                            </li>
-                            <li className="nav-item dropdown mx-1">
-                                <a className="nav-link hover:bg-blue-700 px-3 py-2 rounded-md transition-all duration-200 flex items-center dropdown-toggle" 
-                                   href="#" role="button" data-bs-toggle="dropdown">
-                                    <i className="bi bi-graph-up me-2"></i>Relatórios
-                                </a>
-                                <ul className="dropdown-menu shadow-lg rounded-md border-0">
-                                    <li><a className="dropdown-item hover:bg-blue-50 rounded-md" href="#" onClick={(e) => this.props.seletorView('Listagens', e)}>Top Clientes</a></li>
-                                    <li><a className="dropdown-item hover:bg-blue-50 rounded-md" href="#" onClick={(e) => this.props.seletorView('ListagemGeral', e)}>Mais Consumidos</a></li>
-                                    <li><a className="dropdown-item hover:bg-blue-50 rounded-md" href="#" onClick={(e) => this.props.seletorView('ListagemPorPet', e)}>Consumo por Pet</a></li>
+                                <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={(e) => seletorView('Cadastrar Cliente', e)}>
+                                            <i className="bi bi-person-plus me-2"></i>
+                                            Cliente
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={onAbrirCadastroPet}>
+                                            <i className="bi bi-heart me-2"></i>
+                                            Pet
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={(e) => seletorView('Cadastrar Produto', e)}>
+                                            <i className="bi bi-cart-plus me-2"></i>
+                                            Produto
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="#" onClick={(e) => seletorView('Cadastrar Serviço', e)}>
+                                            <i className="bi bi-scissors me-2"></i>
+                                            Serviço
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
                     </div>
                 </div>
             </nav>
-        )
+        );
     }
 }
