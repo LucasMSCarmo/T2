@@ -15,6 +15,7 @@ import RelatorioTopConsumidores from "./relatoriosTopConsumidores";
 import RelatorioMaisConsumidos from "./relatorioMaisConsumidos";
 import RelatorioConsumoPets from "./relatorioConsumoPets";
 import RelatorioTopValor from "./relatorioTopValor";
+import FormularioRegistroCompra from "./formularioRegistroCompra";
 import { clientes, produtos, servicos } from "./dados";
 import { Cliente, Pet, Produto, Servico } from "./dados";
 
@@ -25,11 +26,11 @@ type State = {
     servicos: typeof servicos;
     clienteSelecionado: typeof clientes[0] | null;
     origemCadastroPet: 'detalhes' | 'menu' | null;
-    mostrarSucesso: boolean;
     petSelecionadoParaEdicao: Pet | null;
     produtoSelecionadoParaEdicao: Produto | null;
     servicoSelecionadoParaEdicao: Servico | null;
     telaAnterior: string;
+    registrarCompra: boolean;
 }
 
 export default class Roteador extends Component<{}, State> {
@@ -42,11 +43,11 @@ export default class Roteador extends Component<{}, State> {
             servicos,
             clienteSelecionado: null,
             origemCadastroPet: null,
-            mostrarSucesso: false,
             petSelecionadoParaEdicao: null,
             produtoSelecionadoParaEdicao: null,
             servicoSelecionadoParaEdicao: null,
-            telaAnterior: 'Clientes'
+            telaAnterior: 'Clientes',
+            registrarCompra: false
         };
         this.selecionarView = this.selecionarView.bind(this);
         this.adicionarCliente = this.adicionarCliente.bind(this);
@@ -70,7 +71,51 @@ export default class Roteador extends Component<{}, State> {
         this.salvarEdicaoServico = this.salvarEdicaoServico.bind(this);
         this.excluirServico = this.excluirServico.bind(this);
         this.fecharDetalhes = this.fecharDetalhes.bind(this);
+        this.registrarCompra = this.registrarCompra.bind(this);
     }
+
+    registrarCompra = (cliente: Cliente, petNome: string, produtos: { produto: Produto, quantidade: number }[], servicos: Servico[]) => {
+        const dataAtual = new Date();
+
+        this.setState(prevState => {
+            const clientesAtualizados = prevState.clientes.map(c => {
+                if (c.email === cliente.email) {
+                    const petsAtualizados = c.pets.map(pet => {
+                        if (pet.nome === petNome) {
+                            const novosProdutos = produtos.map(p => ({
+                                produto: p.produto,
+                                quantidade: p.quantidade,
+                                data: dataAtual
+                            }));
+
+                            const novosServicos = servicos.map(s => ({
+                                servico: s,
+                                data: dataAtual
+                            }));
+
+                            return {
+                                ...pet,
+                                produtosConsumidos: [...pet.produtosConsumidos, ...novosProdutos],
+                                servicosConsumidos: [...pet.servicosConsumidos, ...novosServicos]
+                            };
+                        }
+                        return pet;
+                    });
+
+                    return {
+                        ...c,
+                        pets: petsAtualizados
+                    };
+                }
+                return c;
+            });
+
+            return {
+                clientes: clientesAtualizados,
+                tela: 'Clientes'
+            };
+        });
+    };
 
     selecionarView(novaTela: string, evento: React.MouseEvent) {
         evento.preventDefault();
@@ -142,8 +187,7 @@ export default class Roteador extends Component<{}, State> {
             return {
                 clientes: clientesAtualizados,
                 tela: 'Detalhes Cliente',
-                clienteSelecionado: clienteAtualizado,
-                mostrarSucesso: prevState.origemCadastroPet === 'menu'
+                clienteSelecionado: clienteAtualizado
             };
         });
     }
@@ -152,8 +196,7 @@ export default class Roteador extends Component<{}, State> {
         this.setState({
             tela: 'Cadastrar Pet',
             clienteSelecionado: cliente || null,
-            origemCadastroPet: origem,
-            mostrarSucesso: false
+            origemCadastroPet: origem
         });
     }
 
@@ -296,7 +339,7 @@ export default class Roteador extends Component<{}, State> {
     }
 
     render() {
-        const { tela, clientes, clienteSelecionado, mostrarSucesso } = this.state;
+        const { tela, clientes, clienteSelecionado } = this.state;
 
         return (
             <>
@@ -307,13 +350,6 @@ export default class Roteador extends Component<{}, State> {
                 />
 
                 <div className="container mt-4">
-                    {mostrarSucesso && (
-                        <div className="alert alert-success alert-dismissible fade show">
-                            <i className="bi bi-check-circle-fill me-2"></i>
-                            Pet cadastrado com sucesso!
-                            <button type="button" className="btn-close" onClick={() => this.setState({ mostrarSucesso: false })}></button>
-                        </div>
-                    )}
 
                     {tela === 'Clientes' && (
                         <ListaCliente
@@ -463,6 +499,17 @@ export default class Roteador extends Component<{}, State> {
                             tema="#6c757d"
                             clientes={this.state.clientes}
                             onClienteSelect={this.mostrarDetalhesCliente}
+                        />
+                    )}
+
+                    {tela === 'Registrar Compra' && (
+                        <FormularioRegistroCompra
+                            tema="#6c757d"
+                            clientes={clientes}
+                            produtos={produtos}
+                            servicos={servicos}
+                            onSubmit={this.registrarCompra}
+                            onCancelar={() => this.setState({ tela: 'Clientes' })}
                         />
                     )}
                 </div>
